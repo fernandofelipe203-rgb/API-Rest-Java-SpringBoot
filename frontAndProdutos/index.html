@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <title>Loja - Produtos</title>
+    <style>
+        body {
+            font-family: Arial;
+            margin: 20px;
+        }
+
+        input {
+            margin: 5px;
+            padding: 8px;
+        }
+
+        button {
+            padding: 8px 12px;
+            cursor: pointer;
+        }
+
+        table {
+            width: 100%;
+            margin-top: 20px;
+            border-collapse: collapse;
+        }
+
+        th, td {
+            border: 1px solid #ccc;
+            padding: 10px;
+        }
+    </style>
+</head>
+<body>
+
+<h2>Cadastrar Produto</h2>
+
+<input id="nome" placeholder="Nome">
+<input id="preco" placeholder="Preço">
+<input id="quantidade" placeholder="Quantidade">
+
+<button id="btnSalvar" onclick="salvarOuAtualizar()">Salvar</button>
+
+<h2>Lista de Produtos</h2>
+
+<button onclick="listar()">Atualizar Lista</button>
+
+<table>
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>Nome</th>
+            <th>Preço</th>
+            <th>Quantidade</th>
+            <th>Ações</th>
+        </tr>
+    </thead>
+    <tbody id="tabela"></tbody>
+</table>
+
+<script>
+const url = "http://localhost:8080/produtos";
+
+// CREATE
+function salvar() {
+    fetch(url, {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+            nome: document.getElementById("nome").value,
+            preco: document.getElementById("preco").value,
+            quantidade: document.getElementById("quantidade").value
+        })
+    }).then(() => {
+        listar();
+    });
+}
+
+// READ
+function listar() {
+    fetch(url)
+        .then(res => res.json())
+        .then(data => {
+            let tabela = document.getElementById("tabela");
+            tabela.innerHTML = "";
+
+            data.forEach(produto => {
+                tabela.innerHTML += `
+                    <tr>
+                        <td>${produto.id}</td>
+                        <td>${produto.nome}</td>
+                        <td>${produto.preco}</td>
+                        <td>${produto.quantidade}</td>
+                        <td>
+                           <button onclick="editar(${produto.id}, '${produto.nome}', ${produto.preco}, ${produto.quantidade})">
+                    ✏️ Editar
+                            </button>
+
+                             <button onclick="deletar(${produto.id})">
+                            🗑️ Deletar
+                            </button>
+                        </td>
+                        
+                    </tr>
+                `;
+            });
+        });
+}
+
+// carregar automaticamente
+listar();
+
+function deletar(id) {
+    fetch(`${url}/${id}`, {
+        method: "DELETE"
+    })
+    .then(() => {
+        listar(); // atualiza a tabela
+    });
+}
+let produtoEditandoId = null;
+
+function editar(id, nome, preco, quantidade) {
+    produtoEditandoId = id;
+
+    document.getElementById("nome").value = nome;
+    document.getElementById("preco").value = preco;
+    document.getElementById("quantidade").value = quantidade;
+
+    document.getElementById("btnSalvar").innerText = "Atualizar";
+}
+function atualizar() {
+    fetch(`${url}/${produtoEditandoId}`, {
+        method: "PUT",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+            nome: document.getElementById("nome").value,
+            preco: document.getElementById("preco").value,
+            quantidade: document.getElementById("quantidade").value
+        })
+    }).then(() => {
+        listar();
+        produtoEditandoId = null;
+        document.getElementById("btnSalvar").innerText = "Salvar";
+    });
+}
+let modoEdicao = false;
+
+function salvarOuAtualizar() {
+    if (produtoEditandoId) {
+        atualizar();
+    } else {
+        salvar();
+    }
+}
+</script>
+
+</body>
+</html>

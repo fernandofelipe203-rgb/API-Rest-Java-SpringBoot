@@ -1,50 +1,46 @@
 package com.lojinha.sistemaloja.controller;
 
 import com.lojinha.sistemaloja.model.Produto;
-import com.lojinha.sistemaloja.repository.ProdutoRepository;
+import com.lojinha.sistemaloja.service.ProdutoService;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+@CrossOrigin(origins = "*")
 @RestController
 @RequestMapping("/produtos")
 public class ProdutoController {
 
     @Autowired
-    private ProdutoRepository repository;
+    private ProdutoService service;
 
     @PostMapping
-    public Produto salvar(@RequestBody Produto produto) {
-        return repository.save(produto);
+    public Produto salvar(@Valid @RequestBody Produto produto) {
+        return service.salvar(produto);
     }
-
 
     @GetMapping
     public List<Produto> listar() {
-        return repository.findAll();
+        return service.listar();
     }
+
     @GetMapping("/{id}")
     public Produto buscarPorId(@PathVariable Long id) {
-        return repository.findById(id).orElse(null);
+        return service.buscarPorId(id);
     }
+
     @PutMapping("/{id}")
-    public Produto atualizar(@PathVariable Long id, @RequestBody Produto produtoAtualizado) {
+    public Produto atualizar(
+            @PathVariable Long id,
+            @Valid @RequestBody Produto produtoAtualizado) {
 
-        Produto produto = repository.findById(id).orElse(null);
-
-        if (produto == null) {
-            return null;
-        }
-
-        produto.setNome(produtoAtualizado.getNome());
-        produto.setPreco(produtoAtualizado.getPreco());
-        produto.setQuantidade(produtoAtualizado.getQuantidade());
-
-        return repository.save(produto);
+        return service.atualizar(id, produtoAtualizado);
     }
+
     @DeleteMapping("/{id}")
     public void deletar(@PathVariable Long id) {
-        repository.deleteById(id);
+        service.deletar(id);
     }
 }

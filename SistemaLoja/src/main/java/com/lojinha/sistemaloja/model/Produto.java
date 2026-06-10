@@ -1,9 +1,9 @@
 package com.lojinha.sistemaloja.model;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Positive;
 
 @Entity
 public class Produto {
@@ -12,8 +12,13 @@ public class Produto {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @NotBlank(message = "O nome é obrigatório")
     private String nome;
+
+    @Positive(message = "O preço deve ser maior que zero")
     private double preco;
+
+    @Min(value = 0, message = "A quantidade não pode ser negativa")
     private int quantidade;
 
     public Produto() {
