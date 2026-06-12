@@ -1,11 +1,12 @@
 package com.lojinha.sistemaloja.repository;
 
-import com.lojinha.sistemaloja.model.Produto;
 import com.lojinha.sistemaloja.model.Usuario;
 import org.springframework.data.jpa.repository.JpaRepository;
+
 import java.util.Optional;
 
-public interface ProdutoRepository extends JpaRepository<Produto, Long> {
+public interface UsuarioRepository extends JpaRepository<Usuario, Long> {
 
+    Optional<Usuario> findByNome(String nome);
 
 }

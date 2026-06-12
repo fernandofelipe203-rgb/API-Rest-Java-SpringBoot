@@ -35,4 +35,11 @@ public class GlobalExceptionHandler {
 
         return erros;
     }
+    @ExceptionHandler(RuntimeException.class)
+    public ResponseEntity<String> tratarErro(RuntimeException ex) {
+
+        return ResponseEntity
+                .badRequest()
+                .body(ex.getMessage());
+    }
 }
